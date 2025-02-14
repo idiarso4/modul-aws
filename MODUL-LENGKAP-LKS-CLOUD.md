@@ -231,7 +231,179 @@ aws s3 website s3://my-bucket/ \
 
 ## 7. Application Development
 
-### 7.1 Lambda Functions
+### 7.1 WordPress Installation dan Konfigurasi
+
+#### A. Persiapan Server
+```bash
+# Update sistem
+sudo apt update && sudo apt upgrade -y
+
+# Install LAMP Stack
+sudo apt install apache2 mysql-server php php-mysql php-curl php-gd php-mbstring php-xml php-xmlrpc php-soap php-intl php-zip -y
+
+# Start dan enable services
+sudo systemctl start apache2
+sudo systemctl enable apache2
+sudo systemctl start mysql
+sudo systemctl enable mysql
+```
+
+#### B. Konfigurasi MySQL
+```bash
+# Secure MySQL installation
+sudo mysql_secure_installation
+
+# Buat database WordPress
+sudo mysql -u root -p
+CREATE DATABASE wordpress;
+CREATE USER 'wpuser'@'localhost' IDENTIFIED BY 'password_kuat';
+GRANT ALL PRIVILEGES ON wordpress.* TO 'wpuser'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
+```
+
+#### C. Install WordPress
+```bash
+# Download WordPress
+cd /tmp
+wget https://wordpress.org/latest.tar.gz
+tar xzvf latest.tar.gz
+
+# Pindahkan ke web root
+sudo mv wordpress /var/www/html/
+
+# Set permissions
+sudo chown -R www-data:www-data /var/www/html/wordpress
+sudo chmod -R 755 /var/www/html/wordpress
+```
+
+#### D. Konfigurasi Apache Virtual Host
+```bash
+# Buat file konfigurasi
+sudo nano /etc/apache2/sites-available/wordpress.conf
+
+# Isi dengan konfigurasi berikut
+<VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/html/wordpress
+    ServerName example.com
+    ServerAlias www.example.com
+
+    <Directory /var/www/html/wordpress/>
+        Options FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/wordpress_error.log
+    CustomLog ${APACHE_LOG_DIR}/wordpress_access.log combined
+</VirtualHost>
+
+# Enable site dan module
+sudo a2ensite wordpress.conf
+sudo a2enmod rewrite
+sudo systemctl restart apache2
+```
+
+#### E. Konfigurasi wp-config.php
+```bash
+# Copy sample config
+cd /var/www/html/wordpress
+sudo cp wp-config-sample.php wp-config.php
+
+# Edit konfigurasi
+sudo nano wp-config.php
+
+# Tambahkan konfigurasi berikut
+define('DB_NAME', 'wordpress');
+define('DB_USER', 'wpuser');
+define('DB_PASSWORD', 'password_kuat');
+define('DB_HOST', 'localhost');
+define('DB_CHARSET', 'utf8');
+define('DB_COLLATE', '');
+
+# Tambahkan salt keys (generate dari https://api.wordpress.org/secret-key/1.1/salt/)
+define('AUTH_KEY', 'your-unique-key');
+define('SECURE_AUTH_KEY', 'your-unique-key');
+define('LOGGED_IN_KEY', 'your-unique-key');
+define('NONCE_KEY', 'your-unique-key');
+define('AUTH_SALT', 'your-unique-key');
+define('SECURE_AUTH_SALT', 'your-unique-key');
+define('LOGGED_IN_SALT', 'your-unique-key');
+define('NONCE_SALT', 'your-unique-key');
+```
+
+#### F. Optimasi WordPress
+```bash
+# Edit wp-config.php untuk performance
+define('WP_MEMORY_LIMIT', '256M');
+define('WP_MAX_MEMORY_LIMIT', '256M');
+define('WP_POST_REVISIONS', 5);
+define('AUTOSAVE_INTERVAL', 300);
+define('WP_DEBUG', false);
+
+# Tambahkan di .htaccess untuk caching
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+</IfModule>
+```
+
+#### G. Keamanan WordPress
+```bash
+# Proteksi wp-config.php
+sudo chmod 600 wp-config.php
+
+# Tambahkan di wp-config.php
+define('DISALLOW_FILE_EDIT', true);
+define('WP_AUTO_UPDATE_CORE', true);
+
+# Proteksi direktori
+sudo find /var/www/html/wordpress -type d -exec chmod 755 {} \;
+sudo find /var/www/html/wordpress -type f -exec chmod 644 {} \;
+```
+
+#### H. Backup Setup
+```bash
+# Backup database
+mysqldump -u root -p wordpress > wordpress_backup.sql
+
+# Backup files
+sudo tar -czf wordpress_files_backup.tar.gz /var/www/html/wordpress
+
+# Buat script backup otomatis
+sudo nano /root/backup-wordpress.sh
+
+#!/bin/bash
+TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+BACKUP_DIR="/backup/wordpress"
+mysqldump -u root -p'password' wordpress > $BACKUP_DIR/db_$TIMESTAMP.sql
+tar -czf $BACKUP_DIR/files_$TIMESTAMP.tar.gz /var/www/html/wordpress
+
+# Tambahkan ke crontab
+0 0 * * * /root/backup-wordpress.sh
+```
+
+#### I. Monitoring
+```bash
+# Monitor Apache logs
+tail -f /var/log/apache2/wordpress_error.log
+tail -f /var/log/apache2/wordpress_access.log
+
+# Monitor MySQL logs
+tail -f /var/log/mysql/error.log
+
+# Check PHP configuration
+php -i | grep memory_limit
+php -i | grep max_execution_time
+```
+
+### 7.2 Lambda Functions
 ```bash
 # Create Lambda Function
 aws lambda create-function \
@@ -242,7 +414,7 @@ aws lambda create-function \
     --zip-file fileb://function.zip
 ```
 
-### 7.2 API Gateway
+### 7.3 API Gateway
 ```bash
 # Create REST API
 aws apigateway create-rest-api \
@@ -256,7 +428,7 @@ aws apigateway create-resource \
     --path-part items
 ```
 
-### 7.3 React.js Deployment
+### 7.4 React.js Deployment
 ```bash
 # Build React App
 npm run build
