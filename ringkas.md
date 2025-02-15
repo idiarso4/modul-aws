@@ -1,16 +1,4 @@
-# MODUL LENGKAP PERSIAPAN LKS CLOUD COMPUTING
-Test
-## Daftar Isi
-1. [Pendahuluan](#1-pendahuluan)
-2. [Persiapan Dasar](#2-persiapan-dasar)
-3. [Fundamental Linux dan Server](#3-fundamental-linux-dan-server)
-4. [AWS Core Services](#4-aws-core-services)
-5. [Networking dan Security](#5-networking-dan-security)
-6. [Database dan Storage](#6-database-dan-storage)
-7. [Application Development](#7-application-development)
-8. [Monitoring dan Troubleshooting](#8-monitoring-dan-troubleshooting)
-9. [Kriteria Penilaian](#9-kriteria-penilaian)
-10. [Detail Infrastruktur](#detail-infrastruktur)
+# Ringkasan Perintah untuk AWS Cloud Computing
 
 ## 1. Pendahuluan
 
@@ -211,7 +199,7 @@ aws ec2 create-vpc \
 # Enable DNS hostnames
 aws ec2 modify-vpc-attribute \
     --vpc-id vpc-xxx \
-    --enable-dns-hostnames "{\"Value\":true}"
+    --enable-dns-hostnames '{"Value":true}'
 ```
 
 **Contoh Alamat IP**: `10.0.0.0/16` - Rentang alamat IP untuk VPC yang baru dibuat.
@@ -695,133 +683,38 @@ aws logs create-log-group \
 - [ ] Latihan timeboxing
 - [ ] Backup plan siap
 
-## Detail Infrastruktur
+## Penyelarasan Pengguna Baru
 
-### Modul 1: Infrastruktur Jaringan & Skalabilitas
+### Host: 175.165.1.52
 
-#### Implementasi VPC dengan Load Balancer
-- Penyiapan Virtual Private Cloud (VPC)
-- Konfigurasi Application Load Balancer
-- Implementasi ACL jaringan dan tabel routing
-- Pembuatan koneksi internet gateway
+1. **Buat Pengguna Baru**:
+   Untuk membuat pengguna baru dengan nama `nafis`, jalankan perintah berikut:
+   ```bash
+   sudo useradd nafis
+   ```
 
-#### Konfigurasi Auto Scaling
-- Pembuatan template peluncuran
-- Penyiapan grup Auto Scaling
-- Konfigurasi kebijakan scaling
-- Implementasi alarm CloudWatch untuk pemicu scaling
+2. **Atur Kata Sandi untuk Pengguna Baru**:
+   Selanjutnya, atur kata sandi untuk pengguna `nafis`.
+   ```bash
+   sudo passwd nafis
+   ```
 
-#### Keamanan & Segmentasi Jaringan
-- Konfigurasi grup keamanan
-- Penyiapan subnet publik dan privat
-- Implementasi kontrol akses jaringan
-- Pengelolaan kebijakan keamanan
+3. **Tambahkan Pengguna ke Grup `sija`**:
+   Jika grup `sija` sudah ada, Anda dapat menambahkan pengguna `nafis` ke grup tersebut.
+   ```bash
+   sudo usermod -aG sija nafis
+   ```
 
-#### Pengelolaan Availability Zone
-- Distribusi sumber daya antar AZ
-- Implementasi desain high availability
-- Penyiapan mekanisme failover
-- Pengelolaan komunikasi antar-AZ
-
-### Modul 2: Infrastruktur Aplikasi & Penyimpanan
-
-#### Penyiapan Web Server EC2
-- Deployment instans EC2
-- Konfigurasi software web server
-- Penyiapan dependensi aplikasi
-- Pengelolaan profil instans
-
-#### Sistem Caching Database
-- Implementasi ElastiCache
-- Penyiapan strategi caching
-- Konfigurasi invalidasi cache
-- Pengelolaan performa cache
-
-#### Implementasi Penyimpanan Bersama
-- Penyiapan EFS (Elastic File System)
-- Konfigurasi target mount
-- Pengelolaan izin sistem berkas
-- Implementasi strategi backup
-
-#### Penyiapan Database Relasional
-- Deployment instans RDS
-- Konfigurasi parameter database
-- Penyiapan replikasi
-- Implementasi kebijakan backup
-
-### Modul 3: Layer API & Integrasi
-
-#### Pengelolaan Request HTTP
-- Implementasi routing request
-- Penyiapan endpoint API
-- Pengelolaan siklus request/response
-- Implementasi penanganan error
-
-#### Implementasi API
-- Pengembangan endpoint API root
-- Implementasi fungsi lookup
-- Penyiapan autentikasi API
-- Pengelolaan versi API
-
-#### Orkestrasi Web Server
-- Pengelolaan multiple instans EC2
-- Implementasi redundansi server
-- Konfigurasi monitoring server
-- Pengelolaan log server
-
-#### Integrasi Database
-- Implementasi connection pooling
-- Pengelolaan query database
-- Penyiapan persistensi data
-- Implementasi validasi data
-
-## Format Penilaian
-
-### Kriteria Objektif (0/1)
-1. Konfigurasi VPC
-   - Penyiapan subnet yang benar
-   - Konfigurasi routing yang tepat
-   - Implementasi grup keamanan
-
-2. Implementasi Web Server
-   - Ketersediaan layanan
-   - Instalasi software yang benar
-   - Akurasi konfigurasi
-
-3. Penyiapan Database
-   - Konfigurasi instans yang tepat
-   - Koneksi berhasil
-   - Verifikasi persistensi data
-
-4. Load Balancing & Auto Scaling
-   - Implementasi kebijakan scaling
-   - Distribusi beban
-   - Verifikasi high availability
-
-5. Langkah-langkah Keamanan
-   - Implementasi kontrol akses
-   - Konfigurasi grup keamanan
-   - Verifikasi isolasi jaringan
-
-### Kriteria Subjektif (0-3)
-1. Desain Arsitektur
-   - Keeleganan solusi
-   - Efisiensi sumber daya
-   - Pertimbangan skalabilitas
-
-2. Optimasi Performa
-   - Waktu respons
-   - Penggunaan sumber daya
-   - Efektivitas caching
-
-3. Kualitas Implementasi
-   - Organisasi kode
-   - Kejelasan konfigurasi
-   - Kualitas dokumentasi
-
-## Referensi
-1. [AWS Documentation](https://docs.aws.amazon.com)
-2. [AWS CLI Command Reference](https://awscli.amazonaws.com/v2/documentation/api/latest/index.html)
-3. [AWS Best Practices](https://aws.amazon.com/architecture/well-architected/)
-4. [React Documentation](https://reactjs.org/docs)
-5. [Linux Documentation](https://www.kernel.org/doc/)
+4. **Verifikasi Pengguna dan Grup**:
+   Anda dapat memverifikasi bahwa pengguna `nafis` telah ditambahkan ke grup `sija` dengan menjalankan perintah berikut:
+   ```bash
+   groups nafis
+   ```
+   
+5. **Konfigurasi SSH (Opsional)**:
+   Jika Anda ingin pengguna `nafis` dapat terhubung ke instance EC2 melalui SSH, Anda perlu menambahkan kunci publik SSH pengguna tersebut ke file `~/.ssh/authorized_keys` di home directory pengguna `nafis`. Anda dapat menggunakan perintah berikut untuk melakukannya:
+   ```bash
+   sudo mkdir /home/nafis/.ssh
+   sudo touch /home/nafis/.ssh/authorized_keys
+   ```
+```
